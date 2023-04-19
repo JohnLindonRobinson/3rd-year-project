@@ -1,0 +1,29 @@
+\chapter{Introduction}
+\label{cha:intro}
+
+
+\section{Motivation}
+
+The growing popularity and widespread adoption of smart contracts in various industries have sparked significant interest in ensuring their security, reliability, and robustness. Smart contracts, as self-executing contracts with the terms of the agreement directly written into code, are becoming an essential component of blockchain platforms, such as Bitcoin, Ethereum, Polygon or a suite of other Platforms. They enable secure, decentralized, and automated transactions without intermediaries, increasing efficiency and reducing transaction costs. Despite these potential advantages, poorly designed or vulnerable smart contracts can lead to significant losses, as evidenced by high-profile security breaches, such as a hack on The DAO in 2016, which cost its users 50 Million USD, by exploiting a particular vulnerability.
+
+This dissertation aims to study the effectiveness of the ESBMC (Efficient SMT-Based Context-Bounded Model Checker) in identifying vulnerabilities within smart contracts. ESBMC is a powerful and widely-used tool for formal verification, which has shown great potential in detecting software errors, including concurrency-related bugs and vulnerabilities in smart contracts. However, there is a shortage of research on the performance of ESBMC when applied to smart contracts with known vulnerabilities.
+
+By developing a set of intentionally vulnerable smart contracts to serve as a benchmark, this study seeks to bridge this research gap and provide valuable insights into the capabilities and limitations of ESBMC in detecting and mitigating smart contract vulnerabilities. This benchmark suite will not only help assess the efficiency and accuracy of the ESBMC tool but also contribute to improving and enhancing model-checking techniques for smart contract verification.
+
+Additionally, the findings of this research can assist smart contract developers and security experts in gaining a deeper understanding of potential vulnerabilities and employing more secure coding practices. By evaluating the ESBMC tool's performance on this benchmark, the study also hopes to foster the development of more robust and effective model-checking tools for smart contract verification, ultimately establishing safer and more trustworthy blockchain ecosystems.
+
+\section{Research Question, Aim and Objectives}
+\subsection{Research Question}
+How effectively is ESBMC detecting and mitigating vulnerabilities within a benchmark suite of intentionally vulnerable smart contracts?
+
+\subsection{Aim}
+This study aims to assess the performance of ESBMC in identifying and addressing vulnerabilities in smart contracts found in the SWC Registry \cite{swc} by using a benchmark suite of deliberately vulnerable smart contracts. 
+
+\subsection{Objectives}
+The objectives for this project are as follows: 
+\begin{enumerate}
+    \item To develop a benchmark suite of vulnerable smart contracts that simulate real-world security flaws and weaknesses.
+    \item To evaluate the effectiveness of ESBMC in detecting and analyzing the vulnerabilities within the benchmark suite.
+    \item To investigate the limitations and challenges of using ESBMC for smart contract verification.
+    \item To provide recommendations for improving the performance of ESBMC and other model-checking tools in detecting and mitigating smart contract vulnerabilities.
+\end{enumerate}

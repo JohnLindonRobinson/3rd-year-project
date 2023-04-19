@@ -1,0 +1,20 @@
+{
+    "files.exclude": {
+        "*.aux": true,
+        "*.bbl": true,
+        "*.blg": true,
+        "*.fdb_latexmk": true,
+        "*.fls": true,
+        "*.log": true,
+        "*.synctex.gz": true
+    },
+    "grammarly.selectors": [
+        {
+            "language": "latex",
+            "scheme": "file"
+        }
+    ],
+    "cSpell.words": [
+        "ESBMC"
+    ]
+}
