@@ -8,6 +8,24 @@
 \usepackage{url} % typeset URL's reasonably
 \usepackage{listings}
 
+% The following packages are used to typeset code listings
+% add the listing for solidity
+\lstset{
+  frame=tblr,
+  aboveskip=3pt,
+  belowskip=3pt,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle=\ttfamily,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
+
 \usepackage{pslatex} % Use Postscript fonts
 
 % Uncomment the next line if you want subsubsections to be numbered
@@ -55,8 +73,9 @@ TODO:
 % These include the actual text
 \include{chapter_introduction}
 \include{chapter_background}
+\include{chapter_methodology_and_implementation.tex}
 
-  \bibliography{refs}    % this causes the references to be listed
+\bibliography{refs.bib}
 
 \bibliographystyle{abbrv}
 %% the bibliography style determines the format  in which both citations and references are printed,

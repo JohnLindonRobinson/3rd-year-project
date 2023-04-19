@@ -1,0 +1,51 @@
+\chapter{Methodology and Implementation}
+\label{cha:methodology_and_implementation}
+
+In this chapter, we outline the methodology and implementation of the project, focusing on the development of a benchmark suite of vulnerable smart contracts that cover a wide range of vulnerabilities listed in the Smart Contract Weakness Classification (SWC) Registry \cite{swc}. The purpose of this benchmark suite is to evaluate the capabilities and effectiveness of the ESBMC in detecting and mitigating smart contract vulnerabilities, ultimately contributing to the improvement of verification techniques and tools for smart contract security. By following a systematic and structured approach to create and analyze these vulnerable smart contracts, we aim to provide valuable insights into the performance of ESBMC and identify potential areas for enhancement, fostering the development of more secure and reliable blockchain ecosystems. The benchmark suite does not cover all of the SWC vulnerabilities, but we will discuss the remainder elsewhere, where a more analytical approach is required.
+
+
+\section{SWC Registry Vulnerabilities}
+
+In the following sections, we will look at each SWC vulnerability, discuss how to implement it in a smart contract, and evaluate how ESBMC tests it. The vulnerabilities have been listed in the order they appear in the SWC registry. 
+
+\subsection{Function Default Visibility}
+\label{sec:default_visibility}
+
+\subsubsection{Vulnerability Description}
+
+The Function Default Visibility vulnerability (SWC-100) occurs when a function is not explicitly defined as public, internal, external, or private. The default function visibility, in this case, will be set to public which can be a security risk. For example, a function that is not intended to be called by other contracts can be called by other contracts if it is not explicitly defined as private.
+
+\begin{figure}
+\begin{lstlisting}
+//SPDX-License-Identifier: GPL-2.0
+pragma solidity ^0.8.0;
+
+contract FunctionDefaultVisibility {
+    // Functions that do not specify
+    // visibility default to public.
+    // This can lead to vulnerabilities
+    // if the function is not
+    // intended to be public.
+
+    function publicFunction() public {
+    }
+
+    function privateFunction() private {
+    }
+
+    function internalFunction() internal {
+    }
+
+    function externalFunction() external {
+    }
+
+    function defaultVisibility() {
+        // This function is public by default.
+    }
+})
+\end{lstlisting}
+\caption{Example of a vulnerable contract with Function Default Visibility vulnerability}
+\label{fig:default_visibility}
+\end{figure}
+
+\subsubsection{Implementation in ESBMC}

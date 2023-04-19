@@ -58,3 +58,68 @@ Events are used in Solidity to emit logs that can be monitored by the contract's
 Solidity also supports inheritance, allowing contracts to inherit properties and methods from other contracts. This enables code reuse and modularity, facilitating the development of complex and robust smart contracts.
 
 By understanding the fundamentals of Solidity and its features, developers can create secure and efficient smart contracts on the Ethereum platform. The background knowledge on Solidity provided in this subsection serves as a foundation for the subsequent analysis of smart contract vulnerabilities and the evaluation of ESBMC in this study.
+
+\section{Smart Contract Vulnerabilities}
+
+Smart contract vulnerabilities are security flaws, weaknesses, or design errors in implementing smart contracts, which can lead to unintended behavior or exploitation by malicious actors. Due to the decentralized and transparent nature of blockchain technology and the irreversible nature of transactions on the blockchain, addressing and mitigating these vulnerabilities is paramount for ensuring the security, trustworthiness, and stability of blockchain ecosystems.
+
+Several high-profile incidents, such as the DAO hack in 2016 and the Parity wallet multi-signature vulnerability in 2017 \cite{smartcon-vulnerabilities}, have demonstrated the significant financial and reputational risks associated with smart contract vulnerabilities. These incidents have spurred an increased interest in the research and development of tools and techniques for identifying and mitigating vulnerabilities in smart contracts.
+
+As Ethereum is one of the most widely-used platforms for developing and deploying smart contracts, understanding and addressing vulnerabilities in Ethereum-based smart contracts is crucial for the broader blockchain community. 
+
+\subsection{Smart Contract Weakness Classification (SWC) Registry}
+
+The Smart Contract Weakness Classification (SWC) Registry \cite{swc} is a comprehensive and well-maintained collection of known vulnerabilities and weaknesses in smart contracts. This registry enables developers, security researchers, and auditors to communicate effectively about smart contract security issues and to foster collaboration in addressing them. The MythX team established the SWC Registry to provide a common language and taxonomy for identifying and categorizing smart contract vulnerabilities.
+
+By classifying smart contract weaknesses into distinct categories, the SWC Registry allows for a better understanding and awareness of these vulnerabilities, facilitating more secure coding practices and robust smart contract development. Each vulnerability listed in the SWC Registry is assigned a unique SWC identifier and includes detailed information, such as its description, impact, potential mitigation, and examples.
+
+Some common vulnerability categories in the SWC Registry are:
+
+\begin{itemize}
+\item Reentrancy (SWC-107)
+\item Arithmetic Issues (e.g., Integer Overflow and Underflow) (SWC-101)
+\item Insecure DelegateCall Implementation (SWC-112)
+\item Authorization through tx.origin (SWC-115)
+\end{itemize}
+
+As part of this project, the SWC Registry is a valuable resource for understanding smart contract vulnerabilities, their consequences, and mitigation techniques. By referring to the SWC Registry, the benchmark suite of vulnerable smart contracts is developed to cover a wide range of security weaknesses, ensuring a comprehensive evaluation of ESBMC's effectiveness in detecting and mitigating these vulnerabilities.
+
+Moreover, using the SWC Registry's taxonomy and classification system, this study aims to present a structured and systematic analysis of ESBMC's performance, making it easier for other researchers and developers to compare and contrast the results with those of alternative model-checking tools or verification techniques. This, in turn, will contribute to the overall improvement and advancement of smart contract security research and the development of more secure and reliable blockchain ecosystems.
+
+\section{ESBMC: Efficient SMT-based Bounded Model Checker}
+
+The Efficient SMT-based Bounded Model Checker (ESBMC) is a state-of-the-art software verification tool designed to check the correctness and reliability of programs written in C, C++, and Solidity languages. ESBMC employs Satisfiability Modulo Theories (SMT) solvers to perform bounded model checking, a formal verification technique that explores the state space of a program to detect and analyze potential errors, bugs, or security vulnerabilities within a predefined number of execution steps.
+
+\subsection{ESBMC's Capabilities}
+
+ESBMC is equipped with several advanced features and capabilities that make it a powerful and versatile tool for software verification, particularly in the context of smart contract security. Some of the key capabilities of ESBMC include:
+
+\begin{itemize}
+
+\item \textbf{Bounded Model Checking}: ESBMC uses bounded model checking to explore the state space of a program within a specified depth limit. This technique allows for efficient and scalable verification of complex programs, making ESBMC suitable for analyzing real-world smart contracts with complex logic and interactions.
+
+\item \textbf{SMT Solvers}: ESBMC employs various SMT solvers, such as Z3, CVC4, and Collector, facilitating efficient decision-making and constraint-solving during the verification process. The integration of these solvers enables ESBMC to effectively analyze complex mathematical operations, data structures, and program behaviors.
+
+\item \textbf{Assertion Checking and Invariant Generation}: ESBMC can automatically check user-defined assertions and generate invariants for loops and other program constructs. This capability enables the detection of potential errors or vulnerabilities that could violate a smart contract's intended behavior or safety properties.
+
+\item \textbf{Concurrency Support}: ESBMC provides support for verifying concurrent programs, allowing for the detection and analysis of potential race conditions, deadlocks, and other concurrency-related issues in smart contracts.
+
+\end{itemize}
+
+With these capabilities, ESBMC has the potential to become an effective tool for detecting and mitigating vulnerabilities in Ethereum-based smart contracts. In this study, we aim to evaluate ESBMC's performance and effectiveness in identifying and addressing vulnerabilities within a benchmark suite of intentionally vulnerable smart contracts, ultimately contributing to developing more secure and reliable verification techniques for smart contract security.
+
+\subsection{ESBMC and Solidity}
+
+The current implementation of ESBMC's solidity frontend is a developing area, defined as an "early prototype" in the ESBMC documentation \cite{esbmc_doc}. ESBMC does not support the full Solidity language at the time of writing. Currently supported is the ability to check individual functions for many common vulnerabilities. However, reviewing whole smart contracts is not fully supported, nor are many key elements of the Object Oriented Programming (OOP) paradigm in Solidity. These unfinished features will become limiting for many of the vulnerabilities in the SWC Registry \cite{swc}, as many of them are related to the OOP paradigm or the functionality of a smart contract.
+
+\subsection{ESBMC's Verification Process}
+
+ESBMC takes an input of a solidity smart contract. It then performs a series of steps to verify the smart contract. These steps are shown in Figure \ref{fig:ESBMC_process}. The first step is to parse the smart contract into an intermediate representation (IR); in this case, we use an AST (Abstract Syntax Tree). The AST is then converted into a GOTO program, processed by the symbolic execution engine (SymEx), giving us a static single assignment (SSA) form. The SSA form is then passed to the SMT Solvers (for example, Bitwuzla, Boolector, CVC4, or Yices), which check for errors. The SMT solver will return a counterexample if it finds an error, which is then used to generate a test case. The test case is then used to generate a trace, which is then used to generate a counterexample. The counterexample is then used to generate a bug report, which is then outputted to the user \cite{song2022esbmc}. Further details on SMT-based solving can be found in \textit{SMT-based bounded model checking for embedded ANSI-C software} \cite{cordeiro2011smt}, and it is beyond the scope of this project.
+
+
+\begin{figure}[h]
+\centering
+\includegraphics{ESBMC_process.png}
+\caption{ESBMC's Verification Process \cite{song2022esbmc}}
+\label{fig:ESBMC_process}
+\end{figure}
