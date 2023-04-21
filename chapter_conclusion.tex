@@ -1,0 +1,19 @@
+\chapter{Conclusion}
+\label{cha:conclusion}
+
+To conclude, ESBMC-Solidity is not currently a catch-all platform to completely eliminate all vulnerabilities in a Solidity Smart Contract. In fact, it is not feasible to test for all SWC Vulnerabilities in a Solidity Smart Contract. However, it is a useful tool to help identify and mitigate some of the most common vulnerabilities in Solidity Smart Contracts.
+
+There are a great number of unresolved SWC Vulnerabilities which are feasible to implement. This should greatly increase the usefulness of the ESBMC platform, and allow it to be used as a more comprehensive tool for Solidity Smart Contract verification. The following SWC Vulnerabilities are feasible to implement, and should be considered for future work:
+
+\begin{itemize}
+    \item \textbf{SWC-102} Outdated Compiler Version \ref{sec:outdated_compiler}
+    \item \textbf{SWC-103} Floating Pragma \ref{sec:floating_pragma}
+    \item \textbf{SWC-104} Unchecked Call Return Value \ref{sec:unchecked_call_return_value}
+    \item \textbf{SWC-116} Block Values as a Proxy for Time \ref{sec:block_values_as_a_proxy_for_time}
+    \item \textbf{SWC-122} Lack of Proper Signature Verification \ref{sec:lack_of_proper_signature_verification}
+    \item \textbf{SWC-132} Unexpected Ether balance \ref{sec:unexpected_ether_balance}
+    \item \textbf{SWC-133} Hash Collisions With Multiple Variable Length Arguments \ref{sec:hash_collisions_with_multiple_variable_length_arguments}
+    \item \textbf{SWC-134} Message call with hardcoded gas amount \ref{sec:message_call_with_hardcoded_gas_amount}
+\end{itemize}
+
+While ESBMC Solidity's coverage of SWC Vulnerabilities is not yet comprehensive, it is still a useful tool for Solidity Smart Contract verification. It is able to detect and mitigate many of the most common vulnerabilities in Solidity Smart Contracts. It is limited in its ability to handle many issues still, such as its limited ability to handle Object Oriented Programming in smart contracts. However, the development team can work on this, and this will greatly increase the usefulness of the ESBMC platform.

@@ -1,0 +1,73 @@
+\chapter{Evaluation}
+\label{chapter:evaluation}
+
+There are 37 SWC vulnerabilities. We have investigated 33 of them, the remaining 4 are discussed in Section. \ref{sec:other_vulnerabilities}. The SWC vulnerabilities are listed in Table~\ref{tab:swc} as well as the SWC registry website \cite{swc}. A table table summarising the results of the evaluation is shown in Table~\ref{tab:results}.  As seen there are a number of Analysis Results that are defined as follows:
+
+\begin{itemize}
+    \item \textbf{Resolved} The vulnerability is resolved by the ESBMC tool.
+    \item \textbf{Resolved with recent Solidity Compiler (requires: SWC-102)} The vulnerability is not a vulnerability that ESBMC-Solidity needs to check for since it is resolved by recent versions of the Solidity compiler. However, the vulnerability is still present in older versions of the Solidity compiler. Therefore, the vulnerability is resolved by the ESBMC-Solidity tool if SWC-102 is resolved, section \ref{sec:outdated_compiler}.
+    \item \textbf{Unresolved, Feasible:} The vulnerability is not resolved by the ESBMC tool but it is feasible in future.
+    \item \textbf{Not Feasible: Access Controls} The vulnerability is not resolved by the ESBMC tool and it is not feasible in future due to ESBMC's limited capabilities in testing for sufficient access controls.
+    \item \textbf{Not Feasible: Insufficient Information} The vulnerability is not resolved by the ESBMC tool as the information gathered from the AST is insufficient to determine if the vulnerability is present.
+    \item \textbf{Not Feasible} The vulnerability is not resolved by the ESBMC tool and it is not feasible in future.
+    \item \textbf{Not Feasible: Too Contextual} The vulnerability is not resolved by ESBMC and it is not feasible since it involves functions which are insecure for certain usages but secure for others. For example, a timestamp is not secure for a randomization function but is secure for it's intended use as a time-stamp.
+    \item \textbf{Not Feasible: Too Broad} This vulnerability is not resolved as it is too broad and would be impossible to create an exhaustive pattern check for all possible cases of this vulnerability.
+    \item \textbf{Not Analyzed} The vulnerability has not been analyzed in this study.
+\end{itemize}
+
+Of the 33 vulnerabilities analyzed in this paper, there are 5 vulnerabilities marked as fully resolved, those being SWC's 101, 107, 110, 115, 123. These have been heavily documented already \cite{salim2022esbmc}. There are a further 6 vulnerabilities (SWC-100,109,111,118,119,131) which are as good as resolved while using an up-to-date compiler for Solidity, which would be resolved if issue SWC-102 (section \ref{sec:outdated_compiler}) is solved. These have been separated and indicated individually because I do not believe it is wise to reinvent the wheel when solving vulnerabilities that the Solidity team has already handled, and to emphasize the importance of this particular vulnerability.
+
+There are 8 Vulnerabilities (SWC-102,103,104,116,122,132,133,134) that are not resolved by the ESBMC tool but are feasible in the future. These are the vulnerabilities that I believe should be focused on for ESBMC-Solidity to have a higher coverage of the vulnerabilities outlined in the SWC registry \cite{swc}. These vulnerabilities will be added to ESBMC's Issues list \cite{esbmc_issues} and will be worked on in the future.
+
+The remaining 10 vulnerabilities that have been analyzed in this study (SWC-105,106,108,112,120,121,124,126,129,136) would not be vulnerabilities that ESBMC-Solidity is best suited to solve. These vulnerabilities are either too contextual, too broad, or require too much information to be able to solve them. These vulnerabilities are not feasible to solve with the current capabilities of ESBMC-Solidity.
+
+
+\begin{table}
+    \begin{center}
+        \begin{tabular}{ |c|c|c| } 
+         \hline
+         \textbf{SWC ID} & \textbf{Section} & \textbf{Analysis Result} \\
+            SWC-100 & \ref{sec:default_visibility} & Resolved with recent Solidity Compiler (requires: SWC-102)\\
+            SWC-101 & \ref{sec:integer_overflow} & Resolved\\
+            SWC-102 & \ref{sec:outdated_compiler} & Unresolved, Feasible\\
+            SWC-103 & \ref{sec:floating_pragma} & Unresolved, Feasible\\
+            SWC-104 & \ref{sec:unchecked_call_return_value} & Unresolved, Feasible \\
+            SWC-105 & \ref{sec:unprotected_ether_withdrawal} & Not Feasible: Access Controls\\
+            SWC-106 & \ref{sec:unprotected_self_destruct} &  Not Feasible: Access Controls\\
+            SWC-107 & \ref{sec:reentrancy} & Resolved \\
+            SWC-108 & \ref{sec:state_variable_default_visibility} & Not Feasible: Insufficient Information\\
+            SWC-109 & \ref{sec:uninitialized_storage_pointer} & Resolved with recent Solidity Compiler (requires: SWC-102)\\
+            SWC-110 & \ref{sec:assert_violation} & Resolved \\
+            SWC-111 & \ref{sec:use_of_deprecated_solidity_functions} & Resolved as Well as Feasible (requires: SWC-102)\\
+            SWC-112 & \ref{sec:delegatecall_to_untrusted_callee} & Not Feasible \\
+            SWC-113 & \ref{sec:dos_with_failed_call} & Not Analyzed \\
+            SWC-114 & \ref{sec:other_vulnerabilities} & Not Analyzed \\
+            SWC-115 & \ref{sec:authorization_through_tx.origin} & Resolved \\
+            SWC-116 & \ref{sec:block_values_as_a_proxy_for_time} & Unresolved, Feasible \\
+            SWC-117 & \ref{sec:other_vulnerabilities} & Not Analyzed \\
+            SWC-118 & \ref{sec:incorrect_constructor_name} & Resolved with recent Solidity Compiler (requires: SWC-102)\\
+            SWC-119 & \ref{sec:shadowing_state_variables} & Resolved with recent Solidity Compiler (requires: SWC-102) \\
+            SWC-120 & \ref{sec:weak_sources_of_randomness_from_chain_attributes} & Not Feasible: Too Contextual \\
+            SWC-121 & \ref{sec:missing_protection_against_signature_replay_attacks} & Not Feasible \\
+            SWC-122 & \ref{sec:lack_of_proper_signature_verification} & Unresolved, Feasible \\
+            SWC-123 & \ref{sec:requirement_violation} & Resolved \\
+            SWC-124 & \ref{sec:write_to_arbitrary_storage_location} & Not Feasible: Access Controls\\
+            SWC-125 & \ref{sec:other_vulnerabilities} & Not Analyzed \\
+            SWC-126 & \ref{sec:insufficient_gas_griefing} & Not Feasible: Access Controls\\
+            SWC-127 & \ref{sec:other_vulnerabilities} & Not Analyzed \\
+            SWC-128 & \ref{sec:other_vulnerabilities} & Not Analyzed \\
+            SWC-129 & \ref{sec:typographical_error} & Not Feasible: Too Broad\\
+            SWC-130 & \ref{sec:other_vulnerabilities} & Not Analyzed \\
+            SWC-131 & \ref{sec:presence_of_unused_variables} & Somewhat Resolved by Solidity Compiler, also not a vulnerability\\
+            SWC-132 & \ref{sec:unexpected_ether_balance} & Unresolved, Feasible\\
+            SWC-133 & \ref{sec:hash_collisions_with_multiple_variable_length_arguments} & Unresolved, Feasible\\
+            SWC-134 & \ref{sec:message_call_with_hardcoded_gas_amount} & Unresolved, Feasible\\
+            SWC-135 & \ref{sec:other_vulnerabilities} & Not Analyzed \\
+            SWC-136 & \ref{sec:unencrypted_private_data_on_chain} & Not Feasible: Not Always a vulnerability\\
+         \hline
+        \end{tabular}
+    \label{tab:results}
+    \end{center}
+    \caption{SWC Vulnerabilities and the status of the evaluation}
+    \end{table}
+

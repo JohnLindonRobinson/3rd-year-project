@@ -146,7 +146,7 @@ Like the Outdated Compiler Version vulnerability (SWC-102), ESBMC does not have 
 
 The Unchecked Call Return Value vulnerability (SWC-104) occurs when the return value of a call is not checked. Execution therefore continues as if the call was successful, even if it was not. If the call was not successful, then the execution may be vulnerable to an attack, by breaking the contracts logic.
 
-An example of this vulnerability can be seen in fig. \ref{fig:unchecked_return_value}
+An example of this vulnerability can be seen in fig. \ref{fig:unchecked_return_value}. In this case a function call is made to the callee contract, and if that call were to fail, then the execution would return true. This could lead to a contract becoming vulnerable if a check is written as poorly as this, for example if the callee contract is used for an authentication check then it would not matter if the call failed, as the function would still return true.
 
 \begin{figure}
 \begin{lstlisting}
@@ -154,12 +154,14 @@ An example of this vulnerability can be seen in fig. \ref{fig:unchecked_return_v
 pragma solidity ^0.8.0;
 
 contract UncheckedReturnValue {
-    function callchecked(address callee) public {
+    function callchecked(address callee) public returns (bool) {
         require(callee.call());
+        return true;
     }
 
-    function callunchecked(address callee) public {
+    function callunchecked(address callee) public returns (bool) {
         callee.call();
+        return true;
     }
 }
 \end{lstlisting}
@@ -168,16 +170,14 @@ Source: esbmc-sbms/src/SWC-104/unchecked\_return\_value.sol
 \label{fig:unchecked_return_value}
 \end{figure}
 
-TODO: Make a remark here
+Although ESBMC-Solidity might not have direct support to check for unchecked return values, it is feasible to implement this capability as an extension. By analyzing the control flow and data dependencies within the smart contract code, the model checker could identify instances where external calls are made without validating the return values.
+
+To implement this feature, developers could modify the ESBMC-Solidity tool to track external calls and analyze the subsequent operations to ensure that return values are checked before the execution proceeds. This may involve enhancing the symbolic execution engine and creating specific rules for return value checking. Once implemented, this feature could greatly contribute to the detection of unchecked return values vulnerabilities in Solidity smart contracts, improving their overall security and reliability
 
 \subsection{Unprotected Ether Withdrawal}
 \label{sec:unprotected_ether_withdrawal}
 
-This vulnerability (SWC-105) can occur due to insufficient access controls. One common occurance of this vulnerability is when a contract has a constructor which is not correctly named, which means that the contract can be reinitialized, perhaps with a different owner which may have differing permissions.
-
-Currently ESBMC-Solidity's implementation of Object-Oriented checking is very limited in nature and does not support checking for this vulnerability. However, it is possible to implement this vulnerability by checking the constructor of the contract. If the constructor is not correctly named, then it would be considered vulnerable. This may involve only accepting the constructor name "constructor". However this is only one part of this vulnerability and it is not clear how to check for the other parts of this vulnerability. 
-
-The practical means of fixing a contract with a SWC-105 vulnerability is to ensure that withdrawals and other important functions can only be triggered successfully by some authorized parties. For ESBMC to check for this vulnerability, it would need to be able to check for the existence of access controls, which is not currently possible. ESBMC would also need to be able to detect when a Withdrawal is being made which is much more feasible.
+This vulnerability (SWC-105) can occur due to insufficient access controls. One common occurance of this vulnerability is when a contract has a constructor which is not correctly named, which means that the contract can be reinitialized, perhaps with a different owner which may have differing permissions, see Section. \ref{sec:incorrect_constructor_name}. The practical means of fixing a contract with a SWC-105 vulnerability is to ensure that withdrawals and other important functions can only be triggered successfully by some authorized parties. For ESBMC to check for this vulnerability, it would need to be able to check for the existence of access controls, which is not currently possible. ESBMC would also need to be able to detect when a Withdrawal is being made which is much more feasible.
 
 \subsection{Unprotected Self-Destruct}
 \label{sec:unprotected_self_destruct}
@@ -249,7 +249,7 @@ ESBMC-Solidity can already check for reentrancy vulnerabilities \cite{salim2022e
 \subsection{State Variable Default Visibility}
 \label{sec:state_variable_default_visibility}
 
-The State Variable Default Visibility vulnerability (SWC-108) occurs when a state variable is not explicitly declared as public, private, or internal. This vulnerability means that the state variable is public by default, which can lead to unintended behavior. An attacker can exploit this vulnerability to manipulate the state of the contract or drain its funds. This vulnerability is fundamentally similar in nature to the Function Default Visibility vulnerability (SWC-103), which is discussed in section \ref{sec:function_default_visibility}.
+The State Variable Default Visibility vulnerability (SWC-108) occurs when a state variable is not explicitly declared as public, private, or internal. This vulnerability means that the state variable is public by default, which can lead to unintended behavior. An attacker can exploit this vulnerability to manipulate the state of the contract or drain its funds. This vulnerability is fundamentally similar in nature to the Function Default Visibility vulnerability (SWC-103), which is discussed in section \ref{sec:default_visibility}.
 
 An example of the vulnerability is seen in \ref{fig:state_variable_default_visibility} where the state variable d is internal by default. This may cause unintended behavior if another contract extends the contract. If the contract is extended by another contract, the state variable d will be accessible by the extended contract. This may lead to unintended behavior and can potentially be exploited by attackers to manipulate the state of the contract or drain its funds.
 
@@ -274,7 +274,7 @@ Source: esbmc-sbms/src/SWC-108/state\_variable\_default\_visibility.sol
 \label{fig:state_variable_default_visibility}
 \end{figure}
 
-Unlike in the case of the Function Default Visibility vulnerability, the solc compiler does not output an error when a state variable is not explicitly declared as public, private, or internal; instead it is internal by default, and there is no distinguishing marker in the AST to indicate that the state variable is internal by default or by purpose. This means that ESBMC-Solidity cannot check for this vulnerability at the moment.
+Unlike in the case of the Function Default Visibility vulnerability, the solc compiler does not output an error when a state variable is not explicitly declared as public, private, or internal; instead it is internal by default, and there is no distinguishing marker in the AST to indicate that the state variable is internal by default or by purpose. This means that ESBMC-Solidity cannot check for this vulnerability at the moment, but this may be implemented in the solidity compiler and so may become unnecessary in the future.
 
 \subsection{Unitialized Storage Pointer}
 \label{sec:uninitialized_storage_pointer}
@@ -356,7 +356,7 @@ An example of some use of deprecated solidity functions can be found in fig. \re
 \label{fig:deprecated_solidity_functions}
 \end{figure}
 
-Fortunately, the use of these deprecated functions will cause recent versions of the solidity compiler to throw an error. Therefore this is not a vulnerability ESBMC-Solidity would need to check. However, it would still be possible for a contract that is compiled with an outdated compiler (as discussed in section \ref{sec:outdated_compiler}) to still use these now insecure functions. Therefore, once again, it emphasizes implementing (SWC-102).
+Fortunately, the use of these deprecated functions will cause recent versions of the solidity compiler to throw an error. Therefore this is not a vulnerability ESBMC-Solidity would need to check. However, it would still be possible for a contract that is compiled with an outdated compiler (as discussed in section \ref{sec:outdated_compiler}) to still use these now insecure functions. Therefore, once again, it emphasizes implementing (SWC-102). However this vulnerability could never be fully resolved as functions will always be deprecated and replaced with new ones as time passes on.
 
 \subsection{Delegatecall to Untrusted Callee}
 \label{sec:delegatecall_to_untrusted_callee}
@@ -386,7 +386,7 @@ In figure \ref{fig:failed_call}, the function failLoop will terminate if any of 
 Source: esbmc-sbms/src/SWC-113/DoS\_with\_failed\_call.sol
 \end{figure}
 
-TODO: AFDSAG
+Currently when testing for this vulnerability, ESBMC-Solidity would abort the analysis, citing issue \verb|terminate called after throwing an instance of 'nlohmann::detail::type_error'|. 
 
 \subsection{Authorization through tx.origin}
 \label{sec:authorization_through_tx.origin}
@@ -479,7 +479,7 @@ This is not a vulnerability that ESBMC-Solidity could feasibly check for, as it 
 
 Signature replay attacks are a type of attack that can be used to steal funds from a smart contract. In a signature replay attack, an attacker can use a signature that was intended for a smart contract to only be used a single time, multiple times. For example, suppose they choose to make a particular transaction, say a withdrawal, and receive a signature for verification. In that case, they can use that signature multiple times to withdraw the funds from the smart contract. A lack of this kind of protection is a vulnerability (SWC-121). To avoid this vulnerability, you could, for example, store every message hash used to withdraw funds from the smart contract and check that the message hash has not been used before.
 
-TODO: Discuss ESBMC-Solidity
+ESBMC-Solidity is primarily focused on detecting vulnerabilities that arise due to incorrect implementation or logical flaws in the contract's code. It is designed to verify safety properties, such as absence of overflows, underflows, and out-of-bounds memory access, as well as user-defined properties and assertions. However, signature replay attacks are not directly related to implementing the smart contract's code itself but are more concerned with the context and sequence of transactions. These attacks involve a malicious actor reusing a valid signature from a previous transaction to execute the same operation without the consent of the original signer. This is a vulnerability that does not have a straightforward solution, and thus is not a vulnerability that ESBMC-Solidity can feasibly check for.
 
 \subsection{Lack of Proper Signature Verification}
 \label{sec:lack_of_proper_signature_verification}
@@ -524,5 +524,148 @@ contract SignatureVerification {
 
 ESBMC-Solidity currently does not check for SWC-122. Some pattern-based checks could be implemented to detect this vulnerability, but it's unclear how it would be possible to make an exhaustive check for this vulnerability.
 
+\subsection{Requirement Violation}
+\label{sec:requirement_violation}
 
-\section{}
+The Require Violation vulnerability (SWC-123) occurs when a smart contract does not correctly validate the input parameters of a function. A \verb|require()|, \verb|revert()| or \verb|assert| statement should only fail if there is a bug in the external contract that is called. In this case, since ESBMC solidity cannot detect bugs in external contracts, it is not possible to detect errors in this manner. However this is a vulnerability ESBMC can verify very well.  Bounded model checking is used to symbolically execute the smart contract and explore its possible execution paths. During this process, ESBMC-Solidity evaluates the conditions specified in require() statements and determines whether they can be violated under any circumstances. If a requirement violation is detected, ESBMC-Solidity will report it, usually with a counterexample showing the input values or contract state that caused the violation \cite{salim2022esbmc}.
+\subsection{Write to Arbitrary Storage Location}
+\label{sec:write_to_arbitrary_storage_location}
+
+It's crucial for a smart contract to store data in a secure manner. Data is stored persistently in a storage location with a key or an address for the sake of the EVM level. It is therefore essential that unauthorized users or unauthorized contract accounts do not have write access to the storage location. This vulnerability (SWC-124) occurs when a smart contract allows unauthorized users to write to arbitrary storage locations, circumventing the authorization checks and corrupting the stored data. This vulnerability can lead to important information being overwritten or deleted.
+
+\begin{figure}
+\begin{lstlisting}
+    function pushToArray(uint value) public {
+        array.push(value);
+    }
+
+    function pushToArraySafe(uint value) public {
+        require(msg.sender == owner);
+        array.push(value);
+    }
+\end{lstlisting}
+\caption{Example of a contract that includes a function that allows unauthorized users to write to arbitrary storage locations, and a function that prevents unauthorized users from writing to arbitrary storage locations}
+\label{fig:write_to_arbitrary_storage_location}
+\end{figure}
+
+Figure \ref{fig:write_to_arbitrary_storage_location} shows an example of a contract that includes a function that allows unauthorized users to write to arbitrary storage locations, and a function that prevents unauthorized users from writing to arbitrary storage locations. The first function, \verb|pushToArray|, allows any user to push a value to the array. The second function, \verb|pushToArraySafe|, only allows the owner of the contract to push a value to the array. The second function is a safer implementation of the first function, as it prevents unauthorized users from writing to arbitrary storage locations. This vulnerability is based off of a common vulnerability where insufficient authorization checks are performed, which is a common factor in many of these vulnerabilities. ESBMC-Solidity could not feasibly check for this vulnerability since it would require checking for all possible authorization checks, which is not currently feasible.
+
+\subsection{Insufficient Gas Griefing}
+\label{sec:insufficient_gas_griefing}
+
+The Insufficient Gas Griefing vulnerability (SWC-126) arises when a smart contract relies on the assumption that an externally called contract function will always have enough gas to execute successfully. If a contract does not account for the possibility of the called function running out of gas, it may result in unexpected behavior or unintended consequences, potentially compromising the security and integrity of the smart contract.
+
+In Ethereum, gas is used as a measure of computational effort required to execute an operation. When a function runs out of gas during execution, it reverts all changes made during that function call, as if it never occurred. A malicious actor could exploit the Insufficient Gas Griefing vulnerability by intentionally providing insufficient gas to the called function, causing it to fail and potentially disrupting the normal operation of the smart contract. This vulnerability is very much a runtime vulnerability, but once again we are considering appropriate access control and insufficient checking of return values, as discussed in Section. \ref{sec:unchecked_call_return_value}.
+
+
+\subsection{Typographical Error}
+\label{sec:typographical_error}
+
+Typographical errors are a common cause of vulnerabilities in smart contracts. This vulnerability (SWC-128) occurs when a smart contract contains a typo that causes the contract to behave differently than intended. This vulnerability can lead to severe security breaches and allow malicious actors to compromise the integrity of a smart contract. For example, a typo in a function name can cause the function to be called unintentionally, or a typo in a variable name can cause the variable to be assigned a different value than intended. The example in the project, fig \ref{fig:typographical_error}, shows a function that is supposed to increment a variable, but instead reinitializes the variable to 0. This is a typographical error that can lead to a vulnerability. The unary operator in this case however, has been disallowed in Solidity 0.8.0, so this example is no longer valid. As with many of the other vulnerabilities in the SWC registry, the solidity compiler has been updated with specific cases of common pitfalls, and so implementing Outdated Compiler (\ref{sec:outdated_compiler} SWC-102) is a good way to avoid this vulnerability. However it is not feasible for ESBMC-Solidity to check for all possible typographical errors, so this vulnerability is not currently checked, and it would not be feasible to implement.
+
+\begin{figure}
+\begin{lstlisting}
+    function incrimentVulnerable() public{
+        i =+1; // This reinitializes the variable
+    }
+\end{lstlisting}
+\caption{An extract from a contract that contains a typographical error}
+\label{fig:typographical_error}
+\end{figure}
+
+\subsection{Presence of unused variables}
+\label{sec:presence_of_unused_variables}
+
+Despite being listed in the SWC Registry (as SWC-131), the presence of unused variables is not a security risk and as such has a lower priority than other issues in this registry. However, it is still a good practice to remove unused variables from a smart contract, as they can cause confusion and make the code harder to read and understand. This would however be a simple check as the AST Json file contains information about the variables used in the contract, and when they're used. This could be implemented as a pattern-based check, and would be a good first issue for a new contributor. The solidity compiler already checks for unused local variables, and will throw warnings if it finds any, for example: \verb|Warning: Unused local variable.|
+
+\subsection{Unexpected Ether balance}
+\label{sec:unexpected_ether_balance}
+
+If a smart contract functions on having an exact amount of Ether in its balance, then it is important that the contract does not receive any additional Ether. This vulnerability (SWC-132) occurs when a smart contract receives Ether that it does not expect. This vulnerability can lead to severe security breaches and allow malicious actors to compromise the integrity of a smart contract. For this reason it is imperative that no smart contract relies on having an exact amount of Ether balance. As seen in the example in fig \ref{fig:unexpected_ether_balance}, the contract in this example relies on having an exact amount of Ether balance (8 Ether). If the contract recieves more Ether then the function would be unable to continue. This vulnerability is not currently checked by ESBMC-Solidity. Still, it would be possible to implement a pattern-based check for this vulnerability, throwing an error whenever a balance is placed in a conditional function or if statement.
+
+\begin{figure}
+\begin{lstlisting}
+    function g() public payable {
+        require(msg.value == 8);
+        require(msg.sender.balance == 8);
+    }
+\end{lstlisting}
+\caption{An extract from a vulnerable contract that relies on having an exact amount of Ether balance}
+\label{fig:unexpected_ether_balance}
+\end{figure}
+
+\subsection{Hash Collisions with Multiple Variable Length Arguments}
+\label{sec:hash_collisions_with_multiple_variable_length_arguments}
+
+Hash Collisions With Multiple Variable Length Arguments (SWC-133) occurs when a smart contract function uses \verb|abi.encodePacked()| with multiple variable-length arguments, which, under certain circumstances, can result in hash collisions. This can happen because \verb|abi.encodePacked()| concatenates all elements in order, regardless of whether they belong to an array or not. As a result, elements can be moved between arrays, and as long as they maintain the same order, the encoding will remain the same. In situations where signature verification is involved, an attacker can exploit this vulnerability by modifying the position of elements in a previous function call, effectively bypassing authorization.
+
+To remediate this vulnerability, it is crucial to ensure that matching signatures cannot be achieved using different parameters when using \verb|abi.encodePacked()|. Developers can do this by either restricting user access to the parameters used in abi.encodePacked() or by using fixed-length arrays. Alternatively, developers can use \verb|abi.encode()| instead, which properly encodes the data structure and its length information, preventing ambiguous concatenation.
+
+Additionally, it is recommended to implement replay protection (see SWC-121) in the smart contract. However, it is essential to note that an attacker could still attempt to bypass this protection by front-running the transaction. By adhering to these best practices, developers can mitigate the risk of SWC-133 vulnerabilities and ensure the security and integrity of their smart contracts.
+
+When checking this vulnerability, ESBMC-Solidity would need to check for any usage of \verb|abi.encodePacked()| with multiple variable-length arguments. This would be a simple pattern-based check, which is not yet implemented in ESBMC-Solidity.
+
+\subsection{Message call with hardcoded gas amount}
+\label{sec:message_call_with_hardcoded_gas_amount}
+
+Many smart contracts use functions with hardcoded gas amounts (SWC-134), for example the \verb|transfer()| function has a fixed amount of 2300 gas, but it is advised to change these gas amounts, as they are one of many factors that can lead to a reentrancy attack (see section \ref{sec:reentrancy}). This vulnerability (SWC-134) occurs when a smart contract function uses a hardcoded gas amount. The EVM instructions invovled may change during the execution of the contract, and so the hardcoded gas amount may not be enough to execute the function. For this reason it's best to avoid the \verb|transfer()| and \verb|send()| functions. This vulnerability is not currently checked by ESBMC-Solidity. Still, it would be possible to implement a pattern-based check for this vulnerability, throwing an error whenever a hardcoded gas amount is used, but significantly easier will be to simply flag any usage of the \verb|send()| and \verb|transfer()| as vulnerable - as per the advice given after EIP-1884 \cite{eip-1884}. However currently the ESBMC-Solidity tool does not yet have the ability to test \verb|adress payable| type variables, so this would need to be implemented first \cite{lawley2023esbmc}.
+
+
+\subsection{Unencrypted Private Data On-Chain}
+\label{sec:unencrypted_private_data_on_chain}
+
+Unencrypted Private Data On-Chain (SWC-135) occurs when a smart contract stores private data on-chain without encrypting it. This can lead to a variety of security issues, including the possibility of data theft and the exposure of sensitive information. This vulnerability can be mitigated by encrypting the data before storing it on-chain. This can be done using a variety of encryption algorithms, such as AES, RSA, or ECC. Additionally, it is recommended to use a key management system to store the encryption keys. This will ensure that the keys are not stored on-chain, and that they are not exposed to malicious actors. Simply setting a variable as private is not sufficient, as seen with \_privateVariable in the example in fig \ref{fig:unencrypted_private_data_on_chain}. This variable is still stored on-chain, and can be accessed by anyone with access to the contract. To prevent this vulnerability, it is important to encrypt the data before storing it on-chain. Running ESBMC on either function in the example in fig \ref{fig:unencrypted_private_data_on_chain} will incorrectly result in a successful verification, (the function \verb|setPrivateVariable()| 's output is shown in fig \ref{fig:unencrypted_private_data_on_chain}). This could be implemented by checking if a variable is private and is being returned or otherwise being made visible on chain, and throwing an error if this is the case.
+
+\begin{figure}
+\begin{lstlisting}
+//SPDX-License-Identifier: GPL-2.0
+pragma solidity ^0.8.0;
+
+contract ReadablePrivateVariables {
+    uint256 private _privateVariable = 42;
+
+    function setPrivateVariable(uint256 value) public {
+        _privateVariable = value;
+    }
+
+    function getPrivateVariable() public view returns (uint256) {
+        return _privateVariable;
+    }
+}
+\end{lstlisting}
+\begin{lstlisting}
+ESBMC version 7.1.0 64-bit x86_64 linux
+Target: 64-bit little-endian x86_64-unknown-linux with esbmclibc
+Parsing
+Converting
+Done conversion of intrinsics...
+Checking function setPrivateVariable ...
+  - Pattern-based checking: SWC-115 Authorization through tx.origin
+ checking function body stmt 0
+Generating GOTO Program
+GOTO program creation time: 0.131s
+GOTO program processing time: 0.000s
+Starting Bounded Model Checking
+Symex completed in: 0.000s (12 assignments)
+Slicing time: 0.000s (removed 12 assignments)
+Generated 0 VCC(s), 0 remaining after simplification (0 assignments)
+BMC program time: 0.000s
+
+VERIFICATION SUCCESSFUL
+\end{lstlisting}
+\caption{An extract from a vulnerable contract that stores private data on-chain without encrypting it}
+\label{fig:unencrypted_private_data_on_chain}
+\end{figure}
+
+\subsection{Other vulnerabilities}
+\label{sec:other_vulnerabilities}
+
+The following SWC \cite{swc} vulnerabilities were not addressed in this paper, but are still important to consider when developing smart contracts. These vulnerabilities are:
+
+\begin{itemize}
+    \item \textbf{SWC-114: Transaction Order Dependence: }I determined that this vulnerability would be beyond the scope of this project to discuss.
+    \item \textbf{SWC-117: Signature Malleability: } This vulnerability was not one I was willing to investigate further as I do not believe I have the necessary knowledge to do so.
+    \item \textbf{SWC-125: Incorrect Inheritance Order: }With the current implementation of ESBMC-Solidity, the evaluation of inheritance does not seem like a priority, as the current Object-Oriented features of solidity implementations are not yet fully supported. 
+    \item \textbf{SWC-130: Right-To-Left-Override Control Character: } There are very few legitimate uses for this character, and should be avoided as much as possible. This vulnerability is not currently checked by ESBMC-Solidity, but could be implemented by checking for the presence of this character in the source code, and throwing an error if it is found.
+    \item \textbf{SWC-135: Code with No Effects: } This issue has been discussed in the solidity compiler github \cite{solidity_issue_7118}, and this may not be an appropriate place to discuss this issue.
+\end{itemize}

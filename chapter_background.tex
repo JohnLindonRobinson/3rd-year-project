@@ -86,6 +86,54 @@ As part of this project, the SWC Registry is a valuable resource for understandi
 
 Moreover, using the SWC Registry's taxonomy and classification system, this study aims to present a structured and systematic analysis of ESBMC's performance, making it easier for other researchers and developers to compare and contrast the results with those of alternative model-checking tools or verification techniques. This, in turn, will contribute to the overall improvement and advancement of smart contract security research and the development of more secure and reliable blockchain ecosystems.
 
+\begin{table}
+\begin{center}
+    \begin{tabular}{ |c|c|c| } 
+     \hline
+     \textbf{SWC ID} & \textbf{Vulnerability Title} & \textbf{Section} \\
+        SWC-100 & Function Default Visibility & \ref{sec:default_visibility}\\
+        SWC-101 & Integer Overflow and Underflow & \ref{sec:integer_overflow} \\
+        SWC-102 & Outdated Compiler Version & \ref{sec:outdated_compiler} \\
+        SWC-103 & Floating Pragma & \ref{sec:floating_pragma} \\
+        SWC-104 & Unchecked Call Return Value & \ref{sec:unchecked_call_return_value} \\
+        SWC-105 & Unprotected Ether Withdrawal & \ref{sec:unprotected_ether_withdrawal} \\
+        SWC-106 & Unprotected Self-Destruct & \ref{sec:unprotected_self_destruct} \\
+        SWC-107 & Reentrancy & \ref{sec:reentrancy} \\
+        SWC-108 & State Variable Default Visibility & \ref{sec:state_variable_default_visibility} \\
+        SWC-109 & Unitialized Storage Pointer & \ref{sec:uninitialized_storage_pointer} \\
+        SWC-110 & Assert Violation & \ref{sec:assert_violation} \\
+        SWC-111 & Use of Deprecated Solidity Functions & \ref{sec:use_of_deprecated_solidity_functions} \\
+        SWC-112 & DelegateCall to Untrusted Contract & \ref{sec:delegatecall_to_untrusted_callee} \\
+        SWC-113 & DoS with Failed Call & \ref{sec:dos_with_failed_call} \\
+        SWC-114 & Transaction Order Dependence & \ref{sec:other_vulnerabilities} \\
+        SWC-115 & tx.origin Authentication & \ref{sec:authorization_through_tx.origin} \\
+        SWC-116 & Block values as a Proxy for Time & \ref{sec:block_values_as_a_proxy_for_time} \\
+        SWC-117 & Signature Malleability & \ref{sec:other_vulnerabilities} \\
+        SWC-118 & Incorrect Constructor Name & \ref{sec:incorrect_constructor_name} \\
+        SWC-119 & Shadowing State Variables & \ref{sec:shadowing_state_variables} \\
+        SWC-120 & Weak Sources of Randomness & \ref{sec:weak_sources_of_randomness_from_chain_attributes} \\
+        SWC-121 & Missing Protection against Signature Replay Attacks & \ref{sec:missing_protection_against_signature_replay_attacks} \\
+        SWC-122 & Lack of Proper Signature Verification & \ref{sec:lack_of_proper_signature_verification} \\
+        SWC-123 & Requirement Violation & \ref{sec:requirement_violation} \\
+        SWC-124 & Write to Arbitrary Storage Location & \ref{sec:write_to_arbitrary_storage_location} \\
+        SWC-125 & Incorrect Inheritance Order & \ref{sec:other_vulnerabilities} \\
+        SWC-126 & Insufficient Gas Griefing & \ref{sec:insufficient_gas_griefing} \\
+        SWC-127 & Arbitrary Jump with Function Type Variable & \ref{sec:other_vulnerabilities} \\
+        SWC-128 & DoS With Block Gas Limit & \ref{sec:other_vulnerabilities} \\
+        SWC-129 & Typographical Error & \ref{sec:typographical_error} \\
+        SWC-130 & Right-To-Left-Override control character (U+202E) & \ref{sec:other_vulnerabilities} \\
+        SWC-131 & Presence of unused variables & \ref{sec:presence_of_unused_variables} \\
+        SWC-132 & Unexpected Ether balance & \ref{sec:unexpected_ether_balance} \\
+        SWC-133 & Hash Collisions With Multiple Variable Length Arguments & \ref{sec:hash_collisions_with_multiple_variable_length_arguments} \\
+        SWC-134 & Message call with hardcoded gas amount & \ref{sec:message_call_with_hardcoded_gas_amount} \\
+        SWC-135 & Code with No Effect & \ref{sec:other_vulnerabilities} \\
+        SWC-136 & Unencrypted Private Data On-Chain & \ref{sec:unencrypted_private_data_on_chain} \\
+     \hline
+    \end{tabular}
+\label{tab:swc}
+\end{center}
+\caption{SWC Vulnerabilities as Identified on the SWC Registry \cite{swc}}
+\end{table}
 \section{ESBMC: Efficient SMT-based Bounded Model Checker}
 
 The Efficient SMT-based Bounded Model Checker (ESBMC) is a state-of-the-art software verification tool designed to check the correctness and reliability of programs written in C, C++, and Solidity languages. ESBMC employs Satisfiability Modulo Theories (SMT) solvers to perform bounded model checking, a formal verification technique that explores the state space of a program to detect and analyze potential errors, bugs, or security vulnerabilities within a predefined number of execution steps.
